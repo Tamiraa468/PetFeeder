@@ -1,0 +1,17 @@
+/* styles/globals.css */
+
+.square-card {
+  width: 300px; /* adjust as needed */
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .square-card {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+}
