@@ -5,9 +5,17 @@ import { Modal, Input, message } from "antd";
 import { push, ref } from "firebase/database";
 import { db } from "../lib/firebase";
 
-export default function ScheduleModal({ visible, setVisible }) {
-  const [scheduleTime, setScheduleTime] = useState("");
-  const [scheduleAction, setScheduleAction] = useState("ON");
+type ScheduleModalProps = {
+  visible: boolean;
+  setVisible: (visible: boolean) => void;
+};
+
+export default function ScheduleModal({
+  visible,
+  setVisible,
+}: ScheduleModalProps) {
+  const [scheduleTime, setScheduleTime] = useState<string>("");
+  const [scheduleAction, setScheduleAction] = useState<"ON" | "OFF">("ON");
 
   const handleAddSchedule = () => {
     if (!scheduleTime) {
@@ -44,12 +52,16 @@ export default function ScheduleModal({ visible, setVisible }) {
         <Input
           type="time"
           value={scheduleTime}
-          onChange={(e) => setScheduleTime(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setScheduleTime(e.target.value)
+          }
           placeholder="Select time"
         />
         <select
           value={scheduleAction}
-          onChange={(e) => setScheduleAction(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+            setScheduleAction(e.target.value as "ON" | "OFF")
+          }
           className="p-2 border rounded"
         >
           <option value="ON">Turn ON</option>

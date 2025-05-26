@@ -4,7 +4,12 @@ import { message, Switch } from "antd";
 import { set, ref } from "firebase/database";
 import { db } from "../lib/firebase";
 
-export default function ControlButtons({ isOn, setIsOn }) {
+type ControlButtonsProps = {
+  isOn: boolean;
+  setIsOn: (value: boolean) => void;
+};
+
+export default function ControlButtons({ isOn, setIsOn }: ControlButtonsProps) {
   const toggleDevice = (checked: boolean) => {
     set(ref(db, "Sensor/"), {
       time: { value: checked },

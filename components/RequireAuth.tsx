@@ -1,11 +1,15 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
-import { auth } from '../lib/firebase'; // adjust path if needed
+import { ReactNode, useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { auth } from "../lib/firebase";
 
-export default function RequireAuth({ children }) {
+type RequireAuthProps = {
+  children: ReactNode;
+};
+
+export default function RequireAuth({ children }: RequireAuthProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
@@ -15,7 +19,7 @@ export default function RequireAuth({ children }) {
       if (user) {
         setAuthenticated(true);
       } else {
-        router.push('/login');
+        router.push("/login");
       }
       setLoading(false);
     });

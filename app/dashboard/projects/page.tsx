@@ -10,10 +10,12 @@ import { Button, message, Card } from "antd";
 import ControlButtons from "../../../components/ControlButton";
 import ScheduleList from "../../../components/ScheduleList";
 import ScheduleModal from "../../../components/ScheduleModal";
+import { Schedule } from "../projects/schedule";
 
 export default function ProjectsPage() {
   const [isOn, setIsOn] = useState(false);
-  const [schedules, setSchedules] = useState([]);
+  // ✅ Define the state with proper typing
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const router = useRouter();
 
