@@ -47,7 +47,7 @@ export default function ProjectsPage() {
             (snapshot) => {
               const currentWeight = snapshot.val();
 
-              if (currentWeight <= 200) {
+              if (currentWeight <= 50) {
                 const newState = schedule.action === "ON";
                 set(ref(db, "Sensor/"), {
                   weight: currentWeight,
