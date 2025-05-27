@@ -16,6 +16,7 @@ export default function ProjectsPage() {
   const [isOn, setIsOn] = useState(false);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentWeight, setCurrentWeight] = useState<number | null>(null);
   const router = useRouter();
 
   // Load schedules from Firebase Realtime Database
@@ -29,6 +30,17 @@ export default function ProjectsPage() {
       }
       setSchedules(loadedSchedules);
     });
+  }, []);
+
+  // Fetch current weight from Firebase
+  useEffect(() => {
+    const weightRef = ref(db, "Sensor/weight");
+    const unsubscribe = onValue(weightRef, (snapshot) => {
+      const weight = snapshot.val();
+      setCurrentWeight(weight);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   // Function to handle turning servo ON/OFF with delays
@@ -116,9 +128,9 @@ export default function ProjectsPage() {
       <h1 className="text-2xl font-semibold mb-4">Projects Page</h1>
 
       {/* Inline Cards */}
-      <div className="flex gap-4 mb-6 mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mx-auto">
         <Card
-          className="w-1/2 h-52 flex items-center justify-center"
+          className="h-52 flex items-center justify-center"
           title="Control Panel"
           bordered={true}
         >
@@ -126,13 +138,23 @@ export default function ProjectsPage() {
         </Card>
 
         <Card
-          className="w-1/2 h-52 flex items-center justify-center"
+          className="h-52 flex items-center justify-center"
           title="Schedule New"
           bordered={true}
         >
           <Button type="dashed" onClick={() => setIsModalVisible(true)}>
             Add Schedule
           </Button>
+        </Card>
+
+        <Card
+          className="h-52 flex items-center justify-center"
+          title="Current Weight"
+          bordered={true}
+        >
+          <div className="text-3xl font-bold">
+            {currentWeight !== null ? `${currentWeight} g` : "Loading..."}
+          </div>
         </Card>
       </div>
 
