@@ -14,7 +14,6 @@ import { Schedule } from "../projects/schedule";
 
 export default function ProjectsPage() {
   const [isOn, setIsOn] = useState(false);
-  // ✅ Define the state with proper typing
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const router = useRouter();
@@ -51,25 +50,28 @@ export default function ProjectsPage() {
 
               if (currentWeight <= 50) {
                 const newState = schedule.action === "ON";
-                set(ref(db, "Sensor/"), {
-                  weight: currentWeight,
-                  servo: newState,
-                }).then(() => {
-                  message.success(
-                    `Device turned ${schedule.action} by schedule`
-                  );
 
-                  const scheduleRef = ref(db, `Schedules/${schedule.id}`);
-                  set(scheduleRef, {
-                    ...schedule,
-                    executed: true,
+                // Delay 5 seconds before activating the servo
+                setTimeout(() => {
+                  set(ref(db, "Sensor/"), {
+                    weight: currentWeight,
+                    servo: newState,
+                  }).then(() => {
+                    message.success(
+                      `Device turned ${schedule.action} by schedule`
+                    );
+
+                    const scheduleRef = ref(db, `Schedules/${schedule.id}`);
+                    set(scheduleRef, {
+                      ...schedule,
+                      executed: true,
+                    });
+                    setIsOn(newState);
                   });
-                  setIsOn(newState);
-                });
+                }, 5000); // 5-second delay
               } else {
                 message.warning("Feeding skipped: weight exceeds 200g");
 
-                // Skipped хийгдсэн байдалтай хадгална
                 const scheduleRef = ref(db, `Schedules/${schedule.id}`);
                 set(scheduleRef, {
                   ...schedule,
