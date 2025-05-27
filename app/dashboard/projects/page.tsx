@@ -18,6 +18,7 @@ export default function ProjectsPage() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const router = useRouter();
 
+  // Load schedules from Firebase Realtime Database
   useEffect(() => {
     const schedulesRef = ref(db, "Schedules/");
     onValue(schedulesRef, (snapshot) => {
@@ -30,10 +31,45 @@ export default function ProjectsPage() {
     });
   }, []);
 
+  // Function to handle turning servo ON/OFF with delays
+  async function activateServoWithDelay(
+    schedule: Schedule,
+    currentWeight: number
+  ) {
+    const newState = schedule.action === "ON";
+
+    // Initial 10-second delay before activating servo
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+
+    await set(ref(db, "Sensor/"), {
+      weight: currentWeight,
+      servo: newState,
+    });
+    message.success(`Device turned ${schedule.action} by schedule`);
+
+    const scheduleRef = ref(db, `Schedules/${schedule.id}`);
+    await set(scheduleRef, {
+      ...schedule,
+      executed: true,
+    });
+    setIsOn(newState);
+
+    // Another 10-second delay before turning servo OFF automatically
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+
+    await set(ref(db, "Sensor/"), {
+      weight: currentWeight,
+      servo: false,
+    });
+    setIsOn(false);
+    message.info("Device turned OFF after delay");
+  }
+
+  // Periodically check schedules every minute
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
-      const currentTime = now.toTimeString().slice(0, 5);
+      const currentTime = now.toTimeString().slice(0, 5); // "HH:MM"
 
       schedules.forEach((schedule) => {
         if (
@@ -49,28 +85,10 @@ export default function ProjectsPage() {
               const currentWeight = snapshot.val();
 
               if (currentWeight <= 50) {
-                const newState = schedule.action === "ON";
-
-                // Delay 5 seconds before activating the servo
-                setTimeout(() => {
-                  set(ref(db, "Sensor/"), {
-                    weight: currentWeight,
-                    servo: newState,
-                  }).then(() => {
-                    message.success(
-                      `Device turned ${schedule.action} by schedule`
-                    );
-
-                    const scheduleRef = ref(db, `Schedules/${schedule.id}`);
-                    set(scheduleRef, {
-                      ...schedule,
-                      executed: true,
-                    });
-                    setIsOn(newState);
-                  });
-                }, 10000); // 5-second delay
+                // Activate servo with delay and auto turn-off
+                activateServoWithDelay(schedule, currentWeight);
               } else {
-                message.warning("Feeding skipped: weight exceeds 200g");
+                message.warning("Feeding skipped: weight exceeds 50g");
 
                 const scheduleRef = ref(db, `Schedules/${schedule.id}`);
                 set(scheduleRef, {
