@@ -68,7 +68,7 @@ export default function ProjectsPage() {
                     });
                     setIsOn(newState);
                   });
-                }, 5000); // 5-second delay
+                }, 10000); // 5-second delay
               } else {
                 message.warning("Feeding skipped: weight exceeds 200g");
 
